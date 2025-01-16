@@ -21,13 +21,17 @@ export class PolygonComponent implements AfterViewInit {
   // Store polygons with vertices
   private polygons: { vertices: { x: number; y: number }[], polygon: Konva.Line | null }[] = [];
 
+    // Store canvas dimensions
+    private canvasWidth: number = window.innerWidth - 80;
+    private canvasHeight: number = window.innerHeight - 80;
+
   constructor(private maskService: MaskService, private backgroundImageService: BackgroundImageService) {}
 
   ngAfterViewInit() {
     this.stage = new Konva.Stage({
       container: 'container',
-      width: window.innerWidth - 80,
-      height: window.innerHeight - 80,
+      width: this.canvasWidth,
+      height: this.canvasHeight,
     });
 
     // Main layer for finalized polygons
@@ -165,12 +169,11 @@ export class PolygonComponent implements AfterViewInit {
 
     console.log('All polygon vertices', this.allPolygons);
 
-    this.allPolygons.forEach((vertices, index) => {
-        const maskData = this.maskService.processMask(vertices, 200, 200);
-        masksData[`polygon${index + 1}Mask`] = maskData;
-    });
+    const combinedMaskData = this.maskService.processCombinedMask(this.allPolygons, this.canvasWidth, this.canvasHeight);
 
-    console.log('All Mask Data:', masksData);
+    const jsonData = JSON.stringify(combinedMaskData, null, 2);
+
+    console.log('Combined Mask Data:', jsonData);
     alert('Mask data has been successfully exported to the console. You can check the console for details on the polygons you created.');
 }
 
